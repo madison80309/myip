@@ -1,1 +1,6 @@
+https://www.nslookup.io/domains/bpb.yousef.isegaro.com/dns-records/#cloudflare
+https://www.nslookup.io/domains/hk443.018881.xyz/dns-records/#cloudflare
 https://www.nslookup.io/domains/ips.meizitu.net/dns-records/#cloudflare
+https://www.nslookup.io/domains/jp443.008882.xyz/dns-records/#cloudflare
+https://www.nslookup.io/domains/cfworkers.yyaan.top/dns-records/#cloudflare
+https://www.nslookup.io/domains/jp.isnow.pp.ua/dns-records/#cloudflare
