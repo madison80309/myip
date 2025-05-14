@@ -122,7 +122,9 @@ def main():
         domain = domain.strip()  # 去除每个域名的首尾空格
         if domain:  # 如果是空行则跳过
             print(f"正在处理域名: {domain}")
-            ips = get_ips_from_url(f'https://www.nslookup.io/domains/{domain}/dns-records/#cloudflare', driver)
+            # 直接使用域名构造 URL，不需要加前缀
+            url = f'https://www.nslookup.io/domains/{domain}/dns-records/#cloudflare'
+            ips = get_ips_from_url(url, driver)
             ip_addresses.update(ips)  # 将提取的IP地址添加到集合中
 
     # 打印IP地址集合，确保有数据
