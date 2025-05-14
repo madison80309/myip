@@ -36,6 +36,12 @@ jobs:
           sudo mv /tmp/chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
 
+      # 配置 Git 用户信息
+      - name: Configure Git
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Actions"
+
       # 运行 IP 提取脚本
       - name: Run IP extraction script
         run: python ip_extractor.py
