@@ -2,45 +2,39 @@ name: IP Extractor
 
 on:
   schedule:
-    - cron: '0 */12 * * *'  # 每12小时运行一次
-  workflow_dispatch:  # 手动触发工作流
+    # 每12小时执行一次
+    - cron: '0 */12 * * *'
 
 jobs:
-  ip_extractor_job:
-    runs-on: ubuntu-latest  # 使用最新的 Ubuntu 作为运行环境
+  run_script:
+    runs-on: ubuntu-latest
 
     steps:
       # 检出代码
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
       # 设置 Python 环境
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v2
         with:
-          python-version: '3.9'
+          python-version: '3.9'  # 可以选择其他版本
 
       # 安装依赖
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt  # 确保你有 requirements.txt 或手动安装必要依赖
-          pip install selenium webdriver-manager requests
+          pip install -r requirements.txt
 
       # 运行 IP 提取脚本
       - name: Run IP extraction script
+        run: python ip_extractor.py
+
+      # 提交生成的文件（如果需要推送文件到远程仓库）
+      - name: Commit and push the generated files
         run: |
-          python ip_extractor.py
-
-      # 列出当前目录的文件，确保文件生成
-      - name: List files in the current directory
-        run: ls -alh /
-
-      # 你可以选择上传生成的文件到 GitHub 仓库
-      # - name: Commit and push output files
-      #   run: |
-      #     git config --global user.name "GitHub Actions"
-      #     git config --global user.email "actions@github.com"
-      #     git add ip.txt ip_with_country.txt
-      #     git commit -m "Update IP files"
-      #     git push
+          git add ip.txt ip_with_country.txt
+          git commit -m "Add generated IP files"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
