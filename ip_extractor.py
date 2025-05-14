@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import re
+import os
 
 # 使用 webdriver_manager 自动管理 ChromeDriver
 service = Service(ChromeDriverManager().install())
@@ -29,11 +30,25 @@ country_mapping = {
 
 # 初始化 WebDriver
 def create_driver():
-    return webdriver.Chrome(service=service)
+    # 设置 ChromeOptions
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless')  # 无头模式
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+
+    # 设置一个唯一的用户数据目录，防止冲突
+    user_data_dir = "/tmp/chrome_user_data"
+    if not os.path.exists(user_data_dir):
+        os.makedirs(user_data_dir)
+    options.add_argument(f'--user-data-dir={user_data_dir}')
+
+    # 使用 webdriver_manager 安装的 chromedriver
+    driver = webdriver.Chrome(service=service, options=options)
+    
+    return driver
 
 # 用于提取网页中的IP地址
 def extract_ips_from_page(page_source):
-    # 正则表达式用于匹配有效的IP地址
     ip_regex = r'\b(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b'
     return re.findall(ip_regex, page_source)
 
@@ -46,7 +61,6 @@ def fix_ip_format(ip):
 # 获取IP地址的国家信息
 def get_country_for_ip(ip):
     try:
-        # 使用IPInfo API获取IP的详细信息
         response = requests.get(f'https://ipinfo.io/{ip}/json', timeout=5)  # 设置超时为5秒
         if response.status_code == 200:
             data = response.json()
