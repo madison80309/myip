@@ -140,12 +140,12 @@ def main():
     # 按国家名称排序
     ip_with_country.sort(key=lambda x: x.split('#')[1])  # 根据国家名排序
     
-    # 将IP地址（仅IP）保存到ips.txt
+    # 将IP地址（仅IP）保存到ip.txt
     if ip_addresses:
-        with open('ips.txt', 'w') as file:
+        with open('ip.txt', 'w') as file:
             for ip in ip_addresses:
                 file.write(f"{ip}\n")
-        print(f"提取到的IP地址已保存到 ips.txt 文件中。")
+        print(f"提取到的IP地址已保存到 ip.txt 文件中。")
     else:
         print("没有提取到任何IP地址。")
 
