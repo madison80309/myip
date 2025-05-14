@@ -36,12 +36,6 @@ jobs:
           sudo mv /tmp/chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
 
-      # 配置 Git 用户信息
-      - name: Configure Git
-        run: |
-          git config --global user.email "5981174@qq.com"
-          git config --global user.name "xgonce"
-
       # 运行 IP 提取脚本
       - name: Run IP extraction script
         run: python ip_extractor.py
@@ -51,6 +45,6 @@ jobs:
         run: |
           git add ip.txt ip_with_country.txt
           git commit -m "Add generated IP files"
-          git push https://xgonce:${{ secrets.PERSONAL_ACCESS_TOKEN  }}@github.com/xgonce/myip.git
+          git push https://xgonce:${{ secrets.GITHUB_TOKEN }}@github.com/xgonce/myip.git
         env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN  }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
