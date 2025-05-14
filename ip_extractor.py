@@ -106,8 +106,9 @@ def get_ips_from_url(url, driver):
         return []
 
 def main():
-    # 要访问的第一个网站
-    url = 'https://www.nslookup.io/domains/ips.meizitu.net/dns-records/#cloudflare'
+    # 从 domain.txt 文件读取域名
+    with open('domain.txt', 'r') as file:
+        domains = file.readlines()
 
     # 用于存储提取的IP地址
     ip_addresses = set()  # 使用 set 自动去重
@@ -115,9 +116,13 @@ def main():
     # 初始化 WebDriver
     driver = create_driver()
 
-    # 提取第一个网站的IP地址
-    ips = get_ips_from_url(url, driver)
-    ip_addresses.update(ips)  # 将提取的IP地址添加到集合中
+    # 对每个域名执行 IP 提取
+    for domain in domains:
+        domain = domain.strip()  # 去除每行的换行符
+        if domain:  # 如果是空行则跳过
+            print(f"正在处理域名: {domain}")
+            ips = get_ips_from_url(f'https://www.nslookup.io/domains/{domain}/dns-records/#cloudflare', driver)
+            ip_addresses.update(ips)  # 将提取的IP地址添加到集合中
 
     # 打印IP地址集合，确保有数据
     print(f"收集到的IP地址: {ip_addresses}")
