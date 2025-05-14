@@ -32,11 +32,11 @@ jobs:
         run: |
           python ip_extractor.py
 
-      # 列出工作目录中的文件，确保文件生成
+      # 列出当前目录的文件，确保文件生成
       - name: List files in the current directory
-        run: ls -alh /home/runner/work/myip/myip
+        run: ls -alh /
 
-      # 如果希望上传生成的文件到 GitHub 仓库，可以添加以下步骤
+      # 你可以选择上传生成的文件到 GitHub 仓库
       # - name: Commit and push output files
       #   run: |
       #     git config --global user.name "GitHub Actions"
