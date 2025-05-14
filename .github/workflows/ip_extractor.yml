@@ -29,9 +29,9 @@ jobs:
 
       # 设置 ChromeDriver
       - name: Set up ChromeDriver
-        uses: actions/setup-chromedriver@v1
+        uses: wzieba/setup-chromedriver@v2
         with:
-          chromedriver-version: 'latest'
+          chromedriver-version: 'latest'  # 安装最新版本的 ChromeDriver
 
       # 运行 IP 提取脚本
       - name: Run IP extraction script
