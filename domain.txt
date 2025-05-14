@@ -1,1 +1,6 @@
-ips.meizitu.net
+bpb.yousef.isegaro.com,
+hk443.018881.xyz,
+ips.meizitu.net,
+jp443.008882.xyz,
+cfworkers.yyaan.top,
+jp.isnow.pp.ua
