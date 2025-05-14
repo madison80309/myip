@@ -10,6 +10,9 @@ import time
 import re
 import os
 
+# 打印当前工作目录，确保路径正确
+print(f"当前工作目录: {os.getcwd()}")
+
 # 使用 webdriver_manager 自动管理 ChromeDriver
 service = Service(ChromeDriverManager().install())
 
@@ -26,88 +29,93 @@ country_mapping = {
     "CA": "加拿大",
     "AU": "澳大利亚",
     "BR": "巴西",
-    # 可以根据需要添加更多的映射
 }
 
 # 初始化 WebDriver
 def create_driver():
     options = Options()
-    
-    # 禁用 --user-data-dir 参数，启用无头模式
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--headless")  # 如果你希望无界面模式运行
-    
-    # 创建 WebDriver 实例
     return webdriver.Chrome(service=service, options=options)
 
 # 用于提取网页中的IP地址
 def extract_ips_from_page(page_source):
-    # 正则表达式用于匹配有效的IP地址
     ip_regex = r'\b(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b'
     return re.findall(ip_regex, page_source)
 
-# 用于修正IP地址的格式，去掉每部分的前导零
 def fix_ip_format(ip):
     parts = ip.split('.')
-    fixed_parts = [str(int(part)) for part in parts]  # 转换每个部分为整数，再转换回字符串
+    fixed_parts = [str(int(part)) for part in parts]
     return '.'.join(fixed_parts)
 
-# 获取IP地址的国家信息
 def get_country_for_ip(ip):
     try:
-        # 使用IPInfo API获取IP的详细信息
-        response = requests.get(f'https://ipinfo.io/{ip}/json', timeout=5)  # 设置超时为5秒
+        response = requests.get(f'https://ipinfo.io/{ip}/json', timeout=5)
         if response.status_code == 200:
             data = response.json()
-            country_code = data.get('country', 'Unknown')  # 获取国家信息的代码
-            country_name = country_mapping.get(country_code, '未知')  # 获取中文国家名
+            country_code = data.get('country', 'Unknown')
+            country_name = country_mapping.get(country_code, '未知')
             return country_code, country_name
         else:
-            print(f"无法获取IP地址 {ip} 的国家信息，状态码: {response.status_code}")
             return None, None
     except requests.exceptions.RequestException as e:
-        print(f"获取IP地址 {ip} 国家信息时发生错误或超时: {e}")
         return None, '超时'
 
-# 用于访问网页并提取IP地址
 def get_ips_from_url(url, driver):
     try:
         driver.get(url)
-        # 显式等待页面加载完成
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//body")))
+        time.sleep(2)
 
-        time.sleep(2)  # 确保页面内容完全加载
-        
         page_source = driver.page_source
         ips = extract_ips_from_page(page_source)
-        
-        # 修正每个IP地址的格式
         fixed_ips = [fix_ip_format(ip) for ip in ips]
-        
-        # 去除指定IP地址 '87.74.4.147'
         fixed_ips = [ip for ip in fixed_ips if ip != '87.74.4.147']
-        
-        if fixed_ips:
-            print(f"提取到的修正后的IP地址（排除87.74.4.147）：{fixed_ips}")
-            return fixed_ips
-        else:
-            print(f"没有在 {url} 中提取到有效IP地址")
-            return []
+        return fixed_ips
     except Exception as e:
-        print(f"访问网站 {url} 时发生错误: {e}")
         return []
 
 def main():
-    # 要访问的第一个网站
     url = 'https://www.nslookup.io/domains/ips.meizitu.net/dns-records/#cloudflare'
+    ip_addresses = set()
 
-    # 用于存储提取的IP地址
-    ip_addresses = set()  # 使用 set 自动去重
-
-    # 初始化 WebDriver
     driver = create_driver()
-
-    # 提取第一个网站的IP地址
     ips = get_ips_from_url(url, driver)
-    ip
+    ip_addresses.update(ips)
+
+    ip_with_country = []
+    for ip in ip_addresses:
+        time.sleep(10)
+        country_code, country_name = get_country_for_ip(ip)
+        if country_code and country_name != '超时':
+            ip_with_country.append(f"{ip}#{country_code}{country_name}")
+        else:
+            ip_with_country.append(f"{ip}#超时")
+
+    ip_with_country.sort(key=lambda x: x.split('#')[1])
+
+    ip_file_path = '/home/runner/work/myip/myip/ip.txt'
+    ip_with_country_file_path = '/home/runner/work/myip/myip/ip_with_country.txt'
+
+    try:
+        with open(ip_file_path, 'w') as file:
+            for ip in ip_addresses:
+                file.write(f"{ip}\n")
+        print(f"IP地址已保存到 {ip_file_path}")
+
+        if ip_with_country:
+            with open(ip_with_country_file_path, 'w') as file:
+                for ip_country in ip_with_country:
+                    file.write(f"{ip_country}\n")
+            print(f"带有国家信息的IP地址已保存到 {ip_with_country_file_path}")
+        else:
+            print("没有带国家信息的IP地址。")
+
+    except Exception as e:
+        print(f"保存文件时出错: {e}")
+
+    driver.quit()
+
+if __name__ == "__main__":
+    main()
