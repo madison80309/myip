@@ -95,10 +95,16 @@ def main():
 
     ip_with_country.sort(key=lambda x: x.split('#')[1])
 
-    ip_file_path = '/home/runner/work/myip/myip/ip.txt'
-    ip_with_country_file_path = '/home/runner/work/myip/myip/ip_with_country.txt'
+    # 明确指定文件保存路径为根目录
+    ip_file_path = './ip.txt'
+    ip_with_country_file_path = './ip_with_country.txt'
+
+    # 打印保存路径调试信息
+    print(f"IP 文件将保存到: {ip_file_path}")
+    print(f"带国家信息的 IP 文件将保存到: {ip_with_country_file_path}")
 
     try:
+        # 确保文件保存
         with open(ip_file_path, 'w') as file:
             for ip in ip_addresses:
                 file.write(f"{ip}\n")
