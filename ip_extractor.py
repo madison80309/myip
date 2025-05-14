@@ -1,0 +1,143 @@
+import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+import re
+
+# 使用 webdriver_manager 自动管理 ChromeDriver
+service = Service(ChromeDriverManager().install())
+
+# 国家代码到中文的映射
+country_mapping = {
+    "US": "美国",
+    "CN": "中国",
+    "JP": "日本",
+    "IN": "印度",
+    "GB": "英国",
+    "DE": "德国",
+    "HK": "香港",
+    "FR": "法国",
+    "CA": "加拿大",
+    "AU": "澳大利亚",
+    "BR": "巴西",
+    # 可以根据需要添加更多的映射
+}
+
+# 初始化 WebDriver
+def create_driver():
+    return webdriver.Chrome(service=service)
+
+# 用于提取网页中的IP地址
+def extract_ips_from_page(page_source):
+    # 正则表达式用于匹配有效的IP地址
+    ip_regex = r'\b(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b'
+    return re.findall(ip_regex, page_source)
+
+# 用于修正IP地址的格式，去掉每部分的前导零
+def fix_ip_format(ip):
+    parts = ip.split('.')
+    fixed_parts = [str(int(part)) for part in parts]  # 转换每个部分为整数，再转换回字符串
+    return '.'.join(fixed_parts)
+
+# 获取IP地址的国家信息
+def get_country_for_ip(ip):
+    try:
+        # 使用IPInfo API获取IP的详细信息
+        response = requests.get(f'https://ipinfo.io/{ip}/json', timeout=5)  # 设置超时为5秒
+        if response.status_code == 200:
+            data = response.json()
+            country_code = data.get('country', 'Unknown')  # 获取国家信息的代码
+            country_name = country_mapping.get(country_code, '未知')  # 获取中文国家名
+            return country_code, country_name
+        else:
+            print(f"无法获取IP地址 {ip} 的国家信息，状态码: {response.status_code}")
+            return None, None
+    except requests.exceptions.RequestException as e:
+        print(f"获取IP地址 {ip} 国家信息时发生错误或超时: {e}")
+        return None, '超时'
+
+# 用于访问网页并提取IP地址
+def get_ips_from_url(url, driver):
+    try:
+        driver.get(url)
+        # 显式等待页面加载完成
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//body")))
+
+        time.sleep(2)  # 确保页面内容完全加载
+        
+        page_source = driver.page_source
+        ips = extract_ips_from_page(page_source)
+        
+        # 修正每个IP地址的格式
+        fixed_ips = [fix_ip_format(ip) for ip in ips]
+        
+        # 去除指定IP地址 '87.74.4.147'
+        fixed_ips = [ip for ip in fixed_ips if ip != '87.74.4.147']
+        
+        if fixed_ips:
+            print(f"提取到的修正后的IP地址（排除87.74.4.147）：{fixed_ips}")
+            return fixed_ips
+        else:
+            print(f"没有在 {url} 中提取到有效IP地址")
+            return []
+    except Exception as e:
+        print(f"访问网站 {url} 时发生错误: {e}")
+        return []
+
+def main():
+    # 要访问的第一个网站
+    url = 'https://www.nslookup.io/domains/ips.meizitu.net/dns-records/#cloudflare'
+
+    # 用于存储提取的IP地址
+    ip_addresses = set()  # 使用 set 自动去重
+
+    # 初始化 WebDriver
+    driver = create_driver()
+
+    # 提取第一个网站的IP地址
+    ips = get_ips_from_url(url, driver)
+    ip_addresses.update(ips)  # 将提取的IP地址添加到集合中
+
+    # 获取每个IP的国家信息并保存
+    ip_with_country = []  # 确保初始化变量
+    for ip in ip_addresses:
+        # 添加 2秒的时间间隔
+        time.sleep(2)  # 等待2秒，控制API请求频率
+        
+        country_code, country_name = get_country_for_ip(ip)
+        
+        # 如果API返回国家信息
+        if country_code and country_name != '超时':
+            ip_with_country.append(f"{ip}#{country_code}{country_name}")
+        else:
+            # 处理API超时或出错的情况
+            ip_with_country.append(f"{ip}#超时")
+
+    # 按国家名称排序
+    ip_with_country.sort(key=lambda x: x.split('#')[1])  # 根据国家名排序
+    
+    # 将IP地址（仅IP）保存到ips.txt
+    if ip_addresses:
+        with open('ips.txt', 'w') as file:
+            for ip in ip_addresses:
+                file.write(f"{ip}\n")
+        print(f"提取到的IP地址已保存到 ips.txt 文件中。")
+
+    # 将排序后的IP和国家信息保存到ip_with_country.txt
+    if ip_with_country:
+        with open('ip_with_country.txt', 'w') as file:
+            for ip_country in ip_with_country:
+                file.write(f"{ip_country}\n")
+        print(f"提取到的IP地址和国家信息已按国家排序并保存到 ip_with_country.txt 文件中。")
+    else:
+        print("没有提取到任何有效IP地址。")
+
+    # 关闭WebDriver
+    driver.quit()
+
+if __name__ == "__main__":
+    main()
