@@ -27,11 +27,20 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 设置 ChromeDriver
-      - name: Set up ChromeDriver
-        uses: wzieba/setup-chromedriver@v2
-        with:
-          chromedriver-version: 'latest'  # 安装最新版本的 ChromeDriver
+      # 手动安装 ChromeDriver
+      - name: Install ChromeDriver
+        run: |
+          # 安装依赖包
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+
+          # 下载 ChromeDriver 并解压
+          wget https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip -O /tmp/chromedriver.zip
+          unzip /tmp/chromedriver.zip -d /tmp/
+          sudo mv /tmp/chromedriver /usr/local/bin/
+
+          # 确保它可执行
+          sudo chmod +x /usr/local/bin/chromedriver
 
       # 运行 IP 提取脚本
       - name: Run IP extraction script
