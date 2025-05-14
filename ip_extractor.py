@@ -12,21 +12,36 @@ import os
 # 使用 webdriver_manager 自动管理 ChromeDriver
 service = Service(ChromeDriverManager().install())
 
-# 国家代码到中文的映射
-country_mapping = {
-    "US": "美国",
-    "CN": "中国",
-    "JP": "日本",
-    "IN": "印度",
-    "GB": "英国",
-    "DE": "德国",
-    "HK": "香港",
-    "FR": "法国",
-    "CA": "加拿大",
-    "AU": "澳大利亚",
-    "BR": "巴西",
-    # 可以根据需要添加更多的映射
-}
+# 从 country.txt 加载国家代码到中文名称的映射
+def load_country_mapping():
+    country_mapping = {}
+    try:
+        with open('country.txt', 'r', encoding='utf-8') as file:
+            content = file.read().strip()
+            items = content.split(',')
+            for i in range(0, len(items), 2):  # 每两个值一组
+                if i + 1 < len(items):
+                    country_code = items[i].strip()
+                    country_name = items[i + 1].strip()
+                    country_mapping[country_code] = country_name
+    except FileNotFoundError:
+        print("未找到 country.txt 文件，使用默认的国家映射。")
+        # 如果没有 country.txt 文件，则使用默认的国家映射
+        country_mapping = {
+            "US": "美国",
+            "CN": "中国",
+            "JP": "日本",
+            "IN": "印度",
+            "GB": "英国",
+            "DE": "德国",
+            "HK": "香港",
+            "FR": "法国",
+            "CA": "加拿大",
+            "AU": "澳大利亚",
+            "BR": "巴西",
+            # 可以根据需要添加更多的映射
+        }
+    return country_mapping
 
 # 初始化 WebDriver
 def create_driver():
@@ -59,7 +74,7 @@ def fix_ip_format(ip):
     return '.'.join(fixed_parts)
 
 # 获取IP地址的国家信息
-def get_country_for_ip(ip):
+def get_country_for_ip(ip, country_mapping):
     try:
         response = requests.get(f'https://ipinfo.io/{ip}/json', timeout=5)  # 设置超时为5秒
         if response.status_code == 200:
@@ -111,6 +126,9 @@ def main():
         domains_line = file.read().strip()  # 读取文件并去除首尾空白符
     domains = domains_line.split(',')  # 使用逗号分隔域名
 
+    # 加载国家映射
+    country_mapping = load_country_mapping()
+
     # 用于存储提取的IP地址
     ip_addresses = set()  # 使用 set 自动去重
 
@@ -136,7 +154,7 @@ def main():
         # 添加 2秒的时间间隔
         time.sleep(2)  # 等待2秒，控制API请求频率
         
-        country_code, country_name = get_country_for_ip(ip)
+        country_code, country_name = get_country_for_ip(ip, country_mapping)
         
         # 如果API返回国家信息
         if country_code and country_name != '超时':
