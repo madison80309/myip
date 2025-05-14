@@ -86,6 +86,9 @@ def get_ips_from_url(url, driver):
         page_source = driver.page_source
         ips = extract_ips_from_page(page_source)
         
+        # 调试：打印提取的IP
+        print(f"提取到的IP地址: {ips}")
+        
         # 修正每个IP地址的格式
         fixed_ips = [fix_ip_format(ip) for ip in ips]
         
@@ -93,7 +96,7 @@ def get_ips_from_url(url, driver):
         fixed_ips = [ip for ip in fixed_ips if ip != '87.74.4.147']
         
         if fixed_ips:
-            print(f"提取到的修正后的IP地址（排除87.74.4.147）：{fixed_ips}")
+            print(f"修正后的IP地址（排除87.74.4.147）：{fixed_ips}")
             return fixed_ips
         else:
             print(f"没有在 {url} 中提取到有效IP地址")
@@ -115,6 +118,9 @@ def main():
     # 提取第一个网站的IP地址
     ips = get_ips_from_url(url, driver)
     ip_addresses.update(ips)  # 将提取的IP地址添加到集合中
+
+    # 打印IP地址集合，确保有数据
+    print(f"收集到的IP地址: {ip_addresses}")
 
     # 获取每个IP的国家信息并保存
     ip_with_country = []  # 确保初始化变量
@@ -140,6 +146,8 @@ def main():
             for ip in ip_addresses:
                 file.write(f"{ip}\n")
         print(f"提取到的IP地址已保存到 ips.txt 文件中。")
+    else:
+        print("没有提取到任何IP地址。")
 
     # 将排序后的IP和国家信息保存到ip_with_country.txt
     if ip_with_country:
