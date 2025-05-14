@@ -106,9 +106,10 @@ def get_ips_from_url(url, driver):
         return []
 
 def main():
-    # 从 domain.txt 文件读取域名
+    # 从 domain.txt 文件读取域名，并按逗号分隔
     with open('domain.txt', 'r') as file:
-        domains = file.readlines()
+        domains_line = file.read().strip()  # 读取文件并去除首尾空白符
+    domains = domains_line.split(',')  # 使用逗号分隔域名
 
     # 用于存储提取的IP地址
     ip_addresses = set()  # 使用 set 自动去重
@@ -118,7 +119,7 @@ def main():
 
     # 对每个域名执行 IP 提取
     for domain in domains:
-        domain = domain.strip()  # 去除每行的换行符
+        domain = domain.strip()  # 去除每个域名的首尾空格
         if domain:  # 如果是空行则跳过
             print(f"正在处理域名: {domain}")
             ips = get_ips_from_url(f'https://www.nslookup.io/domains/{domain}/dns-records/#cloudflare', driver)
