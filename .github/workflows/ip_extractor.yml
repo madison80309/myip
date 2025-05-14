@@ -29,8 +29,8 @@ jobs:
       # 配置 Git 用户信息
       - name: Configure Git
         run: |
-          git config --global user.email "your_email@example.com"
-          git config --global user.name "Your Name"
+          git config --global user.email "5981174@qq.com"
+          git config --global user.name "xgonce"
 
       # 运行 IP 提取脚本
       - name: Run IP extraction script
