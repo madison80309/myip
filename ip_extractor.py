@@ -1,12 +1,14 @@
 import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import re
+import tempfile
 
 # 使用 webdriver_manager 自动管理 ChromeDriver
 service = Service(ChromeDriverManager().install())
@@ -29,7 +31,15 @@ country_mapping = {
 
 # 初始化 WebDriver
 def create_driver():
-    return webdriver.Chrome(service=service)
+    options = Options()
+    
+    # 禁用 --user-data-dir 参数，启用无头模式
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--headless")  # 如果你希望无界面模式运行
+    
+    # 创建 WebDriver 实例
+    return webdriver.Chrome(service=service, options=options)
 
 # 用于提取网页中的IP地址
 def extract_ips_from_page(page_source):
@@ -120,14 +130,7 @@ def main():
     # 按国家名称排序
     ip_with_country.sort(key=lambda x: x.split('#')[1])  # 根据国家名排序
     
-    # 将IP地址（仅IP）保存到ips.txt
-    if ip_addresses:
-        with open('ips.txt', 'w') as file:
-            for ip in ip_addresses:
-                file.write(f"{ip}\n")
-        print(f"提取到的IP地址已保存到 ips.txt 文件中。")
-
-    # 将排序后的IP和国家信息保存到ip_with_country.txt
+    # 将排序后的IP和国家信息保存到文件
     if ip_with_country:
         with open('ip_with_country.txt', 'w') as file:
             for ip_country in ip_with_country:
