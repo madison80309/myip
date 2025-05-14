@@ -8,7 +8,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import re
-import tempfile
 import os
 
 # 使用 webdriver_manager 自动管理 ChromeDriver
@@ -111,52 +110,4 @@ def main():
 
     # 提取第一个网站的IP地址
     ips = get_ips_from_url(url, driver)
-    ip_addresses.update(ips)  # 将提取的IP地址添加到集合中
-
-    # 获取每个IP的国家信息并保存
-    ip_with_country = []  # 确保初始化变量
-    for ip in ip_addresses:
-        # 添加 2秒的时间间隔
-        time.sleep(10)  # 等待2秒，控制API请求频率
-        
-        country_code, country_name = get_country_for_ip(ip)
-        
-        # 如果API返回国家信息
-        if country_code and country_name != '超时':
-            ip_with_country.append(f"{ip}#{country_code}{country_name}")
-        else:
-            # 处理API超时或出错的情况
-            ip_with_country.append(f"{ip}#超时")
-
-    # 按国家名称排序
-    ip_with_country.sort(key=lambda x: x.split('#')[1])  # 根据国家名排序
-
-    # 文件路径
-    ip_file_path = 'ip.txt'
-    ip_with_country_file_path = 'ip_with_country.txt'
-
-    # 确保文件写入
-    try:
-        # 将IP地址保存到文件
-        with open(ip_file_path, 'w') as file:
-            for ip in ip_addresses:
-                file.write(f"{ip}\n")
-        print(f"IP地址已保存到 {ip_file_path}")
-
-        # 将带有国家信息的IP保存到文件
-        if ip_with_country:
-            with open(ip_with_country_file_path, 'w') as file:
-                for ip_country in ip_with_country:
-                    file.write(f"{ip_country}\n")
-            print(f"带有国家信息的IP地址已保存到 {ip_with_country_file_path}")
-        else:
-            print("没有带国家信息的IP地址。")
-
-    except Exception as e:
-        print(f"保存文件时出错: {e}")
-
-    # 关闭WebDriver
-    driver.quit()
-
-if __name__ == "__main__":
-    main()
+    ip
