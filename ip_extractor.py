@@ -51,6 +51,7 @@ def fix_ip_format(ip):
 
 def get_country_for_ip(ip):
     try:
+        print(f"查询IP: {ip}")  # 打印正在查询的IP
         response = requests.get(f'https://ipinfo.io/{ip}/json', timeout=5)
         if response.status_code == 200:
             data = response.json()
@@ -58,22 +59,28 @@ def get_country_for_ip(ip):
             country_name = country_mapping.get(country_code, '未知')
             return country_code, country_name
         else:
+            print(f"无法获取IP信息: {ip}，状态码: {response.status_code}")
             return None, None
     except requests.exceptions.RequestException as e:
+        print(f"获取IP信息时出错: {ip}，错误: {e}")
         return None, '超时'
 
 def get_ips_from_url(url, driver):
     try:
+        print(f"正在访问页面: {url}")  # 打印访问的URL
         driver.get(url)
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//body")))
         time.sleep(2)
 
         page_source = driver.page_source
         ips = extract_ips_from_page(page_source)
+        print(f"提取到的IP: {ips}")  # 打印提取到的IP地址
         fixed_ips = [fix_ip_format(ip) for ip in ips]
+        print(f"修正后的IP: {fixed_ips}")  # 打印修正后的IP地址
         fixed_ips = [ip for ip in fixed_ips if ip != '87.74.4.147']
         return fixed_ips
     except Exception as e:
+        print(f"访问页面时出错: {e}")
         return []
 
 def main():
