@@ -2,8 +2,7 @@ name: IP Extractor
 
 on:
   schedule:
-    # 每12小时执行一次
-    - cron: '0 */12 * * *'
+    - cron: '0 */12 * * *'  # 每12小时执行一次
   workflow_dispatch:  # 允许手动触发工作流
 
 jobs:
@@ -19,7 +18,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.9'  # 可以选择其他版本
+          python-version: '3.9'
 
       # 安装依赖
       - name: Install dependencies
@@ -30,16 +29,11 @@ jobs:
       # 手动安装 ChromeDriver
       - name: Install ChromeDriver
         run: |
-          # 安装依赖包
           sudo apt-get update
           sudo apt-get install -y wget unzip
-
-          # 下载 ChromeDriver 并解压
           wget https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip -O /tmp/chromedriver.zip
           unzip /tmp/chromedriver.zip -d /tmp/
           sudo mv /tmp/chromedriver /usr/local/bin/
-
-          # 确保它可执行
           sudo chmod +x /usr/local/bin/chromedriver
 
       # 配置 Git 用户信息
@@ -57,6 +51,6 @@ jobs:
         run: |
           git add ip.txt ip_with_country.txt
           git commit -m "Add generated IP files"
-          git push https://xgonce:${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/xgonce/myip.git
+          git push https://xgonce:${{ secrets.GITHUB_TOKEN }}@github.com/xgonce/myip.git
         env:
-          PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
