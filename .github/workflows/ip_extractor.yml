@@ -51,6 +51,6 @@ jobs:
         run: |
           git add ip.txt ip_with_country.txt
           git commit -m "Add generated IP files"
-          git push https://xgonce:${{ secrets.GITHUB_TOKEN }}@github.com/madison80309/myip.git
+          git push https://xgonce:${{ secrets.GITHUB_TOKEN }}@github.com/myip.git
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ madison80309 }}
