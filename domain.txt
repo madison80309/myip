@@ -1,2 +1,1 @@
-ProxyIP.JP.CMLiussss.net,
-ProxyIP.HK.CMLiussss.net
+ips.madison.eu.org
