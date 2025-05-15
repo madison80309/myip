@@ -1,2 +1,4 @@
-proxyip.hk.cmliussss.net,
-ips.madison.eu.org
+ips.madison.eu.org,
+hk.cmliu.cloudns.org.cdn.cloudflare.net,
+sg.cmliu.cloudns.org.cdn.cloudflare.net
+
