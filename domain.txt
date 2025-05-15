@@ -1,2 +1,2 @@
-ips.madison.eu.org
+ips.madison.eu.org,
 madison.xx.kg
