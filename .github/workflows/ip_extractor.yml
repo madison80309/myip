@@ -53,4 +53,4 @@ jobs:
           git commit -m "Add generated IP files"
           git push https://github.com/${{ secrets.GITHUB_TOKEN }}/myip.git
         env:
-          GITHUB_TOKEN: ${{ madison80309 }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
