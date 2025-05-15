@@ -142,7 +142,7 @@ def main():
             print(f"正在处理域名: {domain}")
             # 直接使用域名构造 URL，不需要加前缀
             url = f'https://www.nslookup.io/domains/{domain}/dns-records/#cloudflare'
-            url = f'https://www.itdog.cn/tcping/ips.meizitu.net:443'
+            https://www.itdog.cn/tcping/ips.meizitu.net:443
             ips = get_ips_from_url(url, driver)
             ip_addresses.update(ips)  # 将提取的IP地址添加到集合中
 
