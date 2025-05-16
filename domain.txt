@@ -1,4 +1,4 @@
-ips.madison.eu.org,
+sg.cmliu.cloudns.org.cdn.cloudflare.net,
 hk.cmliu.cloudns.org.cdn.cloudflare.net,
-sg.cmliu.cloudns.org.cdn.cloudflare.net
+jp.cmliu.cloudns.org.cdn.cloudflare.net
 
