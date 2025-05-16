@@ -1,4 +1,4 @@
 sg.cmliu.cloudns.org.cdn.cloudflare.net,
 hk.cmliu.cloudns.org.cdn.cloudflare.net,
-jp.cmliu.cloudns.org.cdn.cloudflare.net
-
+jp.cmliu.cloudns.org.cdn.cloudflare.net,
+kr.cmliu.cloudns.org.cdn.cloudflare.net
