@@ -2,5 +2,5 @@ sg.cmliu.cloudns.org.cdn.cloudflare.net,
 hk.cmliu.cloudns.org.cdn.cloudflare.net,
 jp.cmliu.cloudns.org.cdn.cloudflare.net,
 kr.cmliu.cloudns.org.cdn.cloudflare.net,
-tw.cmliu.cloudns.org.cdn.cloudflare.net,
-us.cmliu.cloudns.org.cdn.cloudflare.net
+us.cmliu.cloudns.org.cdn.cloudflare.net,
+ip.164746.xyz
